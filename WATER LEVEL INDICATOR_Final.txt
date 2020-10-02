@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Models>
+<Model description="water level indicator." type="coupled" name="wli">
+<Inputs>
+<Port description="person enters the office" type="double" name="entry"/>
+<Port description="Database having reference fingerprints for verification" type="double" name="DB"/>
+<Port description="person has already entered" type="double" name="already_entered"/>
+</Inputs>
+<Outputs>
+<Port description="person exits from office" type="double" name="exit"/>
+<Port description="person has to wait for a server to be free" type="double" name="wait"/>
+<Port description="server has attended the person" type="double" name="response"/>
+</Outputs>
+<Files>
+<File type="MA" name="rponew.ma" location="/"/>
+<File type="EV" name="rponew.ev" location="/"/>
+<File type="LOG" name="rponew.log" location="/"/>
+<File type="BAT" name="rponew.bat" location="/"/>
+</Files>
+</Model>
+<Model description="checks if a person is not showing fake ID proof" type="coupled" name="entryValidator">
+<Inputs>
+<Port description="person enters the office" type="double" name="entry"/>
+<Port description="Database having reference fingerprints for verification" type="double" name="DB"/>
+</Inputs>
+<Outputs>
+<Port description="person exits from office" type="double" name="exit"/>
+</Outputs>
+<Files>
+<File type="MA" name="entryValidator.ma" location="/"/>
+<File type="EV" name="entryValidator.ev" location="/"/>
+<File type="LOG" name="entryValidator.log" location="/"/>
+<File type="BAT" name="entryValidator.bat" location="/"/>
+</Files>
+</Model>
+<Model description="person waits for his turn." type="atomic" name="waitingRoom">
+<Inputs>
+<Port description="person enters the office through waiting room" type="double" name="entry"/>
+</Inputs>
+<Outputs>
+<Port description="wait to go for fingerprint verification is over" type="double" name="wait_over"/>
+</Outputs>
+<Files>
+<File type="MA" name="waitingRoom.ma" location="/"/>
+<File type="EV" name="waitingRoom.ev" location="/"/>
+<File type="LOG" name="waitingRoom.log" location="/"/>
+<File type="BAT" name="waitingRoom.bat" location="/"/>
+</Files>
+</Model>
+<Model description="detects if person is showing genuine photo ID." type="atomic" name="fingerprintVerification">
+<Inputs>
+<Port description="wait to go for fingerprint verification is over" type="double" name="wait_over"/>
+</Inputs>
+<Outputs>
+<Port description="person is not showing genuine ID" type="double" name="ID0"/>
+<Port description="person is showing genuine ID" type="double" name="ID1"/>
+</Outputs>
+<Files>
+<File type="MA" name="fingerprintVerification.ma" location="/"/>
+<File type="EV" name="fingerprintVerification.ev" location="/"/>
+<File type="LOG" name="fingerprintVerification.log" location="/"/>
+<File type="BAT" name="fingerprintVerification.bat" location="/"/>
+</Files>
+</Model>
+<Model description="verifying if not an approved fingerprint was a system mistake and not the person's." type="atomic" name="secondLevelCheck">
+<Inputs>
+<Port description="person is not showing genuine ID" type="double" name="ID0"/>
+</Inputs>
+<Outputs>
+<Port description="not an approved fingerprint was not a system mistake but person's" type="double" name="exit"/>
+</Outputs>
+<Files>
+<File type="MA" name="secondLevelCheck.ma" location="/"/>
+<File type="EV" name="secondLevelCheck.ev" location="/"/>
+<File type="LOG" name="secondLevelCheck.log" location="/"/>
+<File type="BAT" name="secondLevelCheck.bat" location="/"/>
+</Files>
+</Model>
+<Model description="checks if a person has all required documents" type="coupled" name="documentAndIdentityValidator">
+<Inputs>
+<Port description="person with verified identity can enter" type="double" name="ID1"/>
+<Port description="person with verified identity has already entered" type="double" name="already_entered"/>
+</Inputs>
+<Outputs>
+<Port description="server is busy as person with verified identity has already entered " type="double" name="wait"/>
+<Port description="person with verified identity has been told if his document set is complete or not " type="double" name="response"/>
+</Outputs>
+<Files>
+<File type="MA" name="documentAndIdentityValidator.ma" location="/"/>
+<File type="EV" name="documentAndIdentityValidator.ev" location="/"/>
+<File type="LOG" name="documentAndIdentityValidator.log" location="/"/>
+<File type="BAT" name="documentAndIdentityValidator.bat" location="/"/>
+</Files>
+</Model>
+<Model description="tells if a person has entered already or not ." type="atomic" name="counter">
+<Inputs>
+<Port description="person with verified identity can enter" type="double" name="ID1"/>
+<Port description="person with verified identity has already entered" type="double" name="already_entered"/>
+</Inputs>
+<Outputs>
+<Port description="no person has entered so far" type="double" name="C0"/>
+<Port description="a person has already entered" type="double" name="C1"/>
+</Outputs>
+<Files>
+<File type="MA" name="counter.ma" location="/"/>
+<File type="EV" name="counter.ev" location="/"/>
+<File type="LOG" name="counter.log" location="/"/>
+<File type="BAT" name="counter.bat" location="/"/>
+</Files>
+</Model>
+<Model description="server is free to check documents." type="atomic" name="serverFree">
+<Inputs>
+<Port description="no person has entered so far" type="double" name="C0"/>
+</Inputs>
+<Outputs>
+<Port description="person with verified identity has been told if his document set is complete or not" type="double" name="response"/>
+</Outputs>
+<Files>
+<File type="MA" name="serverFree.ma" location="/"/>
+<File type="EV" name="serverFree.ev" location="/"/>
+<File type="LOG" name="serverFree.log" location="/"/>
+<File type="BAT" name="serverFree.bat" location="/"/>
+</Files>
+</Model>
+<Model description="server is not free to check documents." type="atomic" name="serverBusy">
+<Inputs>
+<Port description="a person has already entered" type="double" name="C1"/>
+</Inputs>
+<Outputs>
+<Port description="person with verified identity has to wait as server is not free" type="double" name="wait"/>
+</Outputs>
+<Files>
+<File type="MA" name="serverBusy.ma" location="/"/>
+<File type="EV" name="serverBusy.ev" location="/"/>
+<File type="LOG" name="serverBusy.log" location="/"/>
+<File type="BAT" name="serverBusy.bat" location="/"/>
+</Files>
+</Model>
